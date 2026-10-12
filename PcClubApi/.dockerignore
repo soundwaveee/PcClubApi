@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.git/
+.gitignore
+*.md
+*.db-shm
+*.db-wal
+Dockerfile
+.dockerignore

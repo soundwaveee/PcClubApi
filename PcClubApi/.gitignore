@@ -13,3 +13,7 @@ obj/
 
 # Прочее
 *.user
+
+node_modules/
+.env
+*.log
