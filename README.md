@@ -9,4 +9,6 @@ ASP.NET Core Web API для управления компьютерным клу
 - Docker
 - GitHub Actions
 
-## Запуск в Docker
+
+## Автор
+Бутаков Даниил Сергеевич
