@@ -3,7 +3,7 @@ bin/
 obj/
 
 # Базы данных
-*.db
+
 *.db-shm
 *.db-wal
 
