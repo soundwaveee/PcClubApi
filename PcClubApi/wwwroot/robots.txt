@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /api/
+Disallow: /scalar/
+Disallow: /login.html
+
+Sitemap: https://example.com/sitemap.xml
