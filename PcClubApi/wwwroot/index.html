@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компьютерный клуб - Управление зонами</title>
+    <meta name="description" content="Официальный сайт компьютерного клуба. Просмотр доступных зон, цен и статусов компьютеров.">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased min-h-screen flex flex-col">
+
+    <header class="bg-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-400">PC Club</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="/" class="hover:text-blue-400 transition">Главная</a></li>
+                    <li><a href="/login.html" class="hover:text-blue-400 transition">Личный кабинет</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+
+    <main class="container mx-auto p-6 flex-grow">
+        <section class="mb-10">
+            <h2 class="text-3xl font-semibold mb-4">Наши Зоны</h2>
+            <p class="text-gray-400 mb-6">Выберите идеальное место для игры. У нас есть стандартные и VIP залы.</p>
+            
+            <div id="zones-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="text-gray-500">Загрузка данных...</div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-3xl font-semibold mb-4">Статусы Компьютеров</h2>
+            <ul id="statuses-container" class="flex gap-4">
+            </ul>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 p-4 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Компьютерный клуб. Все права защищены.</p>
+    </footer>
+
+
+    <script>
+        async function loadData() {
+            try {
+
+                const zonesRes = await fetch('/api/Zones');
+                const zones = await zonesRes.json();
+                const zonesContainer = document.getElementById('zones-container');
+                zonesContainer.innerHTML = '';
+
+                zones.forEach(zone => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700';
+                    card.innerHTML = `
+                        <h3 class="text-xl font-bold ${zone.isVip ? 'text-yellow-400' : 'text-blue-400'}">${zone.name}</h3>
+                        <p class="text-gray-300 mt-2">Цена: ${zone.pricePerHour} руб/час</p>
+                        <p class="text-sm text-gray-500 mt-4">Компьютеров в зоне: ${zone.computers.length}</p>
+                    `;
+                    zonesContainer.appendChild(card);
+                });
+
+
+                const statusesRes = await fetch('/api/ComputerStatuses');
+                const statuses = await statusesRes.json();
+                const statusesContainer = document.getElementById('statuses-container');
+                statusesContainer.innerHTML = '';
+                
+                statuses.forEach(status => {
+                    const badge = document.createElement('li');
+                    badge.className = 'bg-blue-900 text-blue-200 px-3 py-1 rounded-full text-sm';
+                    badge.textContent = status.name;
+                    statusesContainer.appendChild(badge);
+                });
+
+            } catch (error) {
+                console.error("Ошибка при загрузке данных:", error);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
