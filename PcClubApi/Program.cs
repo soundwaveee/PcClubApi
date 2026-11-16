@@ -1,11 +1,32 @@
 using Microsoft.EntityFrameworkCore;
 using PcClubApi.Data;
 using Scalar.AspNetCore;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;  
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi(); 
 
@@ -19,13 +40,14 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
 
-// app.UseHttpsRedirection(); // 
+app.UseAuthentication(); 
 app.UseAuthorization();
 app.MapControllers();
 

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Компьютерный клуб - Управление зонами</title>
-    <meta name="description" content="Официальный сайт компьютерного клуба. Просмотр доступных зон, цен и статусов компьютеров.">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased min-h-screen flex flex-col">
@@ -13,19 +12,18 @@
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-400">PC Club</h1>
             <nav>
-                <ul class="flex space-x-4">
+                <ul class="flex space-x-4 items-center">
                     <li><a href="/" class="hover:text-blue-400 transition">Главная</a></li>
-                    <li><a href="/login.html" class="hover:text-blue-400 transition">Личный кабинет</a></li>
+                    <li id="auth-nav"><a href="/login.html" class="hover:text-blue-400 transition">Личный кабинет</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-
     <main class="container mx-auto p-6 flex-grow">
         <section class="mb-10">
             <h2 class="text-3xl font-semibold mb-4">Наши Зоны</h2>
-            <p class="text-gray-400 mb-6">Выберите идеальное место для игры. У нас есть стандартные и VIP залы.</p>
+            <p class="text-gray-400 mb-6">Выберите идеальное место для игры. Нажмите на зону, чтобы посмотреть компьютеры.</p>
             
             <div id="zones-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="text-gray-500">Загрузка данных...</div>
@@ -34,8 +32,7 @@
 
         <section>
             <h2 class="text-3xl font-semibold mb-4">Статусы Компьютеров</h2>
-            <ul id="statuses-container" class="flex gap-4">
-            </ul>
+            <ul id="statuses-container" class="flex gap-4"></ul>
         </section>
     </main>
 
@@ -43,11 +40,74 @@
         <p>&copy; 2026 Компьютерный клуб. Все права защищены.</p>
     </footer>
 
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl border border-gray-600">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-blue-400">Зона</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            </div>
+            
+            <div id="computers-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+            </div>
+        </div>
+    </div>
+
+    <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компьютерный клуб - Управление зонами</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased min-h-screen flex flex-col">
+
+    <header class="bg-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-400">PC Club</h1>
+            <nav>
+                <ul class="flex space-x-4 items-center">
+                    <li><a href="/" class="hover:text-blue-400 transition">Главная</a></li>
+                    <li id="auth-nav"><a href="/login.html" class="hover:text-blue-400 transition">Личный кабинет</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6 flex-grow">
+        <section class="mb-10">
+            <h2 class="text-3xl font-semibold mb-4">Наши Зоны</h2>
+            <p class="text-gray-400 mb-6">Выберите идеальное место для игры. Нажмите на зону, чтобы посмотреть компьютеры.</p>
+            
+            <div id="zones-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="text-gray-500">Загрузка данных...</div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-3xl font-semibold mb-4">Статусы Компьютеров</h2>
+            <ul id="statuses-container" class="flex gap-4"></ul>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 p-4 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Компьютерный клуб. Все права защищены.</p>
+    </footer>
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl border border-gray-600">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-blue-400">Зона</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            </div>
+            
+            <div id="computers-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+        </div>
+    </div>
 
     <script>
         async function loadData() {
             try {
-
                 const zonesRes = await fetch('/api/Zones');
                 const zones = await zonesRes.json();
                 const zonesContainer = document.getElementById('zones-container');
@@ -55,15 +115,15 @@
 
                 zones.forEach(zone => {
                     const card = document.createElement('div');
-                    card.className = 'bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700';
+                    card.className = 'bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 cursor-pointer hover:border-blue-500 transition';
+                    card.onclick = () => openModal(zone.name, zone.computers);
                     card.innerHTML = `
                         <h3 class="text-xl font-bold ${zone.isVip ? 'text-yellow-400' : 'text-blue-400'}">${zone.name}</h3>
                         <p class="text-gray-300 mt-2">Цена: ${zone.pricePerHour} руб/час</p>
-                        <p class="text-sm text-gray-500 mt-4">Компьютеров в зоне: ${zone.computers.length}</p>
+                        <p class="text-sm text-gray-500 mt-4">Компьютеров в зоне: ${zone.computers.length} (Нажмите, чтобы посмотреть)</p>
                     `;
                     zonesContainer.appendChild(card);
                 });
-
 
                 const statusesRes = await fetch('/api/ComputerStatuses');
                 const statuses = await statusesRes.json();
@@ -72,14 +132,166 @@
                 
                 statuses.forEach(status => {
                     const badge = document.createElement('li');
-                    badge.className = 'bg-blue-900 text-blue-200 px-3 py-1 rounded-full text-sm';
+                    const colors = status.id === 1 ? 'bg-green-900 text-green-200' : 
+                                   status.id === 2 ? 'bg-red-900 text-red-200' : 'bg-gray-700 text-gray-300';
+                    badge.className = `${colors} px-3 py-1 rounded-full text-sm font-bold`;
                     badge.textContent = status.name;
                     statusesContainer.appendChild(badge);
                 });
 
             } catch (error) {
                 console.error("Ошибка при загрузке данных:", error);
+                document.getElementById('zones-container').innerHTML = '<div class="text-red-500">Ошибка загрузки данных.</div>';
             }
+        }
+
+        function openModal(zoneName, computers) {
+            document.getElementById('modal-title').innerText = `Зона: ${zoneName}`;
+            const list = document.getElementById('computers-list');
+            list.innerHTML = '';
+
+            const today = new Date();
+            const maxDate = new Date();
+            maxDate.setDate(today.getDate() + 7);
+            
+            const minDateStr = today.toISOString().split('T')[0];
+            const maxDateStr = maxDate.toISOString().split('T')[0];
+
+            if (!computers || computers.length === 0) {
+                list.innerHTML = '<p class="text-gray-400">В этой зоне пока нет компьютеров.</p>';
+            } else {
+                computers.forEach(pc => {
+                    const isFree = pc.statusId === 1;
+                    const item = document.createElement('div');
+                    item.className = 'bg-gray-700 p-4 rounded-lg border border-gray-600 mb-4';
+                    
+                    item.innerHTML = `
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-white">${pc.name}</h4>
+                            <p class="text-sm text-gray-300 mt-1">${pc.specs || 'Нет данных'}</p>
+                        </div>
+                        ${isFree 
+                            ? `<div class="bg-gray-800 p-3 rounded-lg border border-gray-600">
+                                <p class="text-sm text-gray-400 mb-2 font-bold">Забронировать это место:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+                                    <input type="tel" id="phone-${pc.id}" placeholder="+7 (___) ___-__-__" maxlength="18" oninput="formatPhone(this)" class="p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                                    <input type="date" id="date-${pc.id}" min="${minDateStr}" max="${maxDateStr}" class="p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                                    <input type="time" id="time-${pc.id}" class="p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                                </div>
+                                <button onclick="bookComputer(${pc.id})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition">Забронировать</button>
+                               </div>`
+                            : `<div class="text-right"><span class="text-red-400 font-bold px-4 py-2 bg-red-900 rounded-lg text-sm">Занят</span></div>`
+                        }
+                    `;
+                    list.appendChild(item);
+                });
+            }
+            
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        function formatPhone(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.startsWith('8')) value = '7' + value.substring(1);
+            if (!value.startsWith('7') && value.length > 0) value = '7' + value;
+            if (value.length > 11) value = value.substring(0, 11);
+
+            let formatted = '';
+            if (value.length > 0) {
+                formatted = '+7';
+                if (value.length > 1) formatted += ' (' + value.substring(1, 4);
+                if (value.length > 4) formatted += ') ' + value.substring(4, 7);
+                if (value.length > 7) formatted += '-' + value.substring(7, 9);
+                if (value.length > 9) formatted += '-' + value.substring(9, 11);
+            }
+            input.value = formatted;
+        }
+
+         async function bookComputer(id) {
+            const phone = document.getElementById(`phone-${id}`).value;
+            const dateStr = document.getElementById(`date-${id}`).value;
+            const time = document.getElementById(`time-${id}`).value;
+
+            if(!phone || !dateStr || !time) {
+                alert('Пожалуйста, заполните телефон, дату и время!');
+                return;
+            }
+
+            if(phone.length !== 18) {
+                alert('Пожалуйста, введите номер телефона полностью!');
+                return;
+            }
+
+            const selectedDate = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const maxDate = new Date();
+            maxDate.setDate(today.getDate() + 7);
+
+            if (selectedDate < today) {
+                alert('Нельзя бронировать на прошедшую дату!');
+                return;
+            }
+            if (selectedDate > maxDate) {
+                alert('Можно бронировать только на 7 дней вперед!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/Computers/${id}/book`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: phone, date: dateStr, time: time })
+                });
+
+                if (response.ok) {
+                    alert('Компьютер успешно забронирован!');
+                    closeModal();
+                    loadData();
+                } else {
+                    const err = await response.json();
+                    alert(err.message || 'Ошибка бронирования');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка сервера при бронировании');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('jwt_token');
+            const username = localStorage.getItem('username');
+            const authNav = document.getElementById('auth-nav');
+
+            if (token && username && authNav) {
+                authNav.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <a href="/profile.html" class="text-blue-400 font-bold hover:text-blue-300 transition">Привет, ${username}!</a>
+                        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition">Выйти</button>
+                    </div>
+                `;
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('username');
+            window.location.reload();
         }
 
         loadData();

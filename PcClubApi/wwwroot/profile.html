@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мой Профиль - PC Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans min-h-screen flex flex-col">
+
+    <header class="bg-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-400">PC Club</h1>
+            <nav>
+                <ul class="flex space-x-4 items-center">
+                    <li><a href="/" class="hover:text-blue-400 transition">Главная</a></li>
+                    <li id="auth-nav"></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6 flex-grow">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl mx-auto mt-10">
+            <h2 class="text-3xl font-bold text-blue-400 mb-4">Личный кабинет</h2>
+            <p class="text-gray-300 text-lg">Добро пожаловать, <span id="user-name" class="font-bold text-white"></span>!</p>
+            
+            <div class="mt-8 p-4 bg-gray-700 rounded border border-gray-600">
+                <h3 class="text-xl font-semibold mb-2">Ваш статус:</h3>
+                <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm">Авторизован</span>
+            </div>
+            
+            <p class="text-gray-400 mt-6">Здесь в будущем будет отображаться история ваших игровых сессий и баланс.</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('jwt_token');
+            const username = localStorage.getItem('username');
+
+            if (!token || !username) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            document.getElementById('user-name').innerText = username;
+            const authNav = document.getElementById('auth-nav');
+            authNav.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-blue-400 font-bold">Привет, ${username}!</span>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition">Выйти</button>
+                </div>
+            `;
+        });
+
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('username');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

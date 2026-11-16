@@ -21,6 +21,36 @@ namespace PcClubApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("PcClubApi.Models.Booking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BookingDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BookingTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ComputerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputerId");
+
+                    b.ToTable("Bookings");
+                });
+
             modelBuilder.Entity("PcClubApi.Models.Computer", b =>
                 {
                     b.Property<int>("Id")
@@ -53,6 +83,35 @@ namespace PcClubApi.Migrations
                     b.HasIndex("ZoneId");
 
                     b.ToTable("Computers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IpAddress = "192.168.1.10",
+                            Name = "PC-01",
+                            Specs = "RTX 3060, i5-12400, 16GB RAM | Периферия: Монитор 144Hz, Мышь Logitech G102, Наушники HyperX",
+                            StatusId = 1,
+                            ZoneId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IpAddress = "192.168.1.11",
+                            Name = "PC-02",
+                            Specs = "RTX 3060, i5-12400, 16GB RAM | Периферия: Монитор 144Hz, Мышь Razer DeathAdder, Клавиатура Redragon",
+                            StatusId = 2,
+                            ZoneId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IpAddress = "192.168.1.50",
+                            Name = "VIP-PC-01",
+                            Specs = "RTX 4090, i9-13900K, 32GB RAM | Периферия: Монитор 240Hz 4K, Мышь Logitech G Pro X, Клавиатура Wooting 60HE, Наушники Audeze",
+                            StatusId = 1,
+                            ZoneId = 2
+                        });
                 });
 
             modelBuilder.Entity("PcClubApi.Models.ComputerStatus", b =>
@@ -89,6 +148,31 @@ namespace PcClubApi.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PcClubApi.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("PcClubApi.Models.Zone", b =>
                 {
                     b.Property<int>("Id")
@@ -110,6 +194,33 @@ namespace PcClubApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Zones");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsVip = false,
+                            Name = "Standard",
+                            PricePerHour = 150m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsVip = true,
+                            Name = "VIP Room",
+                            PricePerHour = 400m
+                        });
+                });
+
+            modelBuilder.Entity("PcClubApi.Models.Booking", b =>
+                {
+                    b.HasOne("PcClubApi.Models.Computer", "Computer")
+                        .WithMany()
+                        .HasForeignKey("ComputerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Computer");
                 });
 
             modelBuilder.Entity("PcClubApi.Models.Computer", b =>

@@ -3,27 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta name="robots" content="noindex, nofollow">
     <title>Вход в систему - PC Club</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center h-screen">
     <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-96">
-        <h1 class="text-2xl font-bold mb-6 text-center">Вход в личный кабинет</h1>
-        <form>
+        
+        <h1 id="form-title" class="text-2xl font-bold mb-6 text-center">Вход в систему</h1>
+        
+        <div id="message" class="text-center mb-4 text-sm font-bold hidden"></div>
+
+        <form id="auth-form">
             <div class="mb-4">
                 <label class="block text-gray-400 mb-2">Логин</label>
-                <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500">
+                <input type="text" id="username" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500" required>
             </div>
             <div class="mb-6">
                 <label class="block text-gray-400 mb-2">Пароль</label>
-                <input type="password" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500">
+                <input type="password" id="password" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500" required>
             </div>
-            <button type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+            
+            <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition mb-4">
                 Войти
             </button>
         </form>
+
+        <div class="text-center text-sm text-gray-400">
+            <span id="toggle-text">Нет аккаунта?</span>
+            <button type="button" id="toggle-btn" class="text-blue-400 hover:text-blue-300 font-bold ml-1">Зарегистрироваться</button>
+        </div>
     </div>
+
+    <script>
+        let isLoginMode = true;
+
+        const form = document.getElementById('auth-form');
+        const title = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const messageBox = document.getElementById('message');
+
+        toggleBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            
+            form.reset();
+            messageBox.classList.add('hidden');
+
+            if (isLoginMode) {
+                title.innerText = 'Вход в систему';
+                submitBtn.innerText = 'Войти';
+                toggleText.innerText = 'Нет аккаунта?';
+                toggleBtn.innerText = 'Зарегистрироваться';
+            } else {
+                title.innerText = 'Регистрация';
+                submitBtn.innerText = 'Создать аккаунт';
+                toggleText.innerText = 'Уже есть аккаунт?';
+                toggleBtn.innerText = 'Войти';
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const url = isLoginMode ? '/api/Auth/login' : '/api/Auth/register';
+
+            messageBox.classList.remove('hidden');
+            messageBox.className = 'text-center mb-4 text-sm font-bold text-blue-400';
+            messageBox.innerText = 'Загрузка...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (isLoginMode) {
+                        localStorage.setItem('jwt_token', data.token);
+                        localStorage.setItem('username', data.username);
+                        window.location.href = '/'; // Перекидываем на главную
+                    } 
+                    else {
+                        messageBox.className = 'text-center mb-4 text-sm font-bold text-green-500';
+                        messageBox.innerText = 'Успешно! Теперь войдите.';
+                        // Автоматически переключаем на форму входа через 1.5 секунды
+                        setTimeout(() => toggleBtn.click(), 1500);
+                    }
+                } else {
+                    messageBox.className = 'text-center mb-4 text-sm font-bold text-red-500';
+                    messageBox.innerText = data.message || 'Произошла ошибка';
+                }
+            } catch (err) {
+                messageBox.className = 'text-center mb-4 text-sm font-bold text-red-500';
+                messageBox.innerText = 'Ошибка подключения к серверу';
+            }
+        });
+    </script>
 </body>
 </html>
