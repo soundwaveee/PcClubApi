@@ -25,7 +25,7 @@ app.UseStaticFiles();
 app.MapOpenApi();
 app.MapScalarApiReference();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // 
 app.UseAuthorization();
 app.MapControllers();
 

@@ -10,4 +10,4 @@
 
 ## Результаты Lighthouse
 * Оценка "До" (страница документации Scalar API) - `before.png`.
-* Оценка "После" (главная страница сайта) - `after.png`.
+* Оценка "После" (главная страница сайта) - `after.png`.git checkout -b feature/seo
